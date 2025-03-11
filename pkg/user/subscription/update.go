@@ -4,6 +4,7 @@ import (
 	"context"
 
 	submwcli "github.com/NpoolPlatform/billing-middleware/pkg/client/user/subscription"
+	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1/user/subscription"
 	submwpb "github.com/NpoolPlatform/message/npool/billing/mw/v1/user/subscription"
 )
 
@@ -11,7 +12,7 @@ type updateHandler struct {
 	*checkHandler
 }
 
-func (h *Handler) UpdateSubscription(ctx context.Context) (*submwpb.Subscription, error) {
+func (h *Handler) UpdateSubscription(ctx context.Context) (*npool.UserSubscription, error) {
 	handler := &updateHandler{
 		checkHandler: &checkHandler{
 			Handler: h,

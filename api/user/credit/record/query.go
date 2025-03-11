@@ -1,100 +1,100 @@
-package addon
+package record
 
 import (
 	"context"
 
-	addon1 "github.com/NpoolPlatform/billing-gateway/pkg/addon"
+	record1 "github.com/NpoolPlatform/billing-gateway/pkg/user/credit/record"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1/addon"
+	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1/user/credit/record"
 )
 
-func (s *Server) GetAddon(ctx context.Context, in *npool.GetAddonRequest) (*npool.GetAddonResponse, error) {
-	handler, err := addon1.NewHandler(
+func (s *Server) GetUserCreditRecord(ctx context.Context, in *npool.GetUserCreditRecordRequest) (*npool.GetUserCreditRecordResponse, error) {
+	handler, err := record1.NewHandler(
 		ctx,
-		addon1.WithEntID(&in.EntID, true),
+		record1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetAddon",
+			"GetUserCreditRecord",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetAddonResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.GetUserCreditRecordResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	info, err := handler.GetAddon(ctx)
+	info, err := handler.GetUserCreditRecord(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetAddon",
+			"GetUserCreditRecord",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetAddonResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.GetUserCreditRecordResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.GetAddonResponse{
+	return &npool.GetUserCreditRecordResponse{
 		Info: info,
 	}, nil
 }
 
-func (s *Server) GetAddons(ctx context.Context, in *npool.GetAddonsRequest) (*npool.GetAddonsResponse, error) {
-	handler, err := addon1.NewHandler(
+func (s *Server) GetUserCreditRecords(ctx context.Context, in *npool.GetUserCreditRecordsRequest) (*npool.GetUserCreditRecordsResponse, error) {
+	handler, err := record1.NewHandler(
 		ctx,
-		addon1.WithOffset(in.Offset),
-		addon1.WithLimit(in.Limit),
+		record1.WithOffset(in.Offset),
+		record1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetAddons",
+			"GetUserCreditRecords",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetAddonsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.GetUserCreditRecordsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	infos, err := handler.GetAddons(ctx)
+	infos, err := handler.GetUserCreditRecords(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetAddons",
+			"GetUserCreditRecords",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetAddonsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.GetUserCreditRecordsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.GetAddonsResponse{
+	return &npool.GetUserCreditRecordsResponse{
 		Infos: infos,
 	}, nil
 }
 
-func (s *Server) GetAddonsCount(ctx context.Context, in *npool.GetAddonsCountRequest) (*npool.GetAddonsCountResponse, error) {
-	handler, err := addon1.NewHandler(
+func (s *Server) GetUserCreditRecordsCount(ctx context.Context, in *npool.GetUserCreditRecordsCountRequest) (*npool.GetUserCreditRecordsCountResponse, error) {
+	handler, err := record1.NewHandler(
 		ctx,
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetAddonsCount",
+			"GetUserCreditRecordsCount",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetAddonsCountResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.GetUserCreditRecordsCountResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	total, err := handler.GetAddonsCount(ctx)
+	total, err := handler.GetUserCreditRecordsCount(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetAddonsCount",
+			"GetUserCreditRecordsCount",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetAddonsCountResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.GetUserCreditRecordsCountResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.GetAddonsCountResponse{
+	return &npool.GetUserCreditRecordsCountResponse{
 		Total: total,
 	}, nil
 }

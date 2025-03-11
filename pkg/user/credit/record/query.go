@@ -1,31 +1,31 @@
-package subscription
+package record
 
 import (
 	"context"
 	"fmt"
 
 	gwcommon "github.com/NpoolPlatform/billing-gateway/pkg/common"
-	submwcli "github.com/NpoolPlatform/billing-middleware/pkg/client/user/subscription"
+	recordmwcli "github.com/NpoolPlatform/billing-middleware/pkg/client/user/credit/record"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1/user/subscription"
-	submwpb "github.com/NpoolPlatform/message/npool/billing/mw/v1/user/subscription"
+	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1/user/credit/record"
+	recordmwpb "github.com/NpoolPlatform/message/npool/billing/mw/v1/user/credit/record"
 )
 
 type queryHandler struct {
 	*Handler
-	subs  []*submwpb.Subscription
-	infos []*npool.UserSubscription
-	apps  map[string]*appmwpb.App
-	users map[string]*usermwpb.User
+	records []*recordmwpb.Record
+	infos   []*npool.UserCreditRecord
+	apps    map[string]*appmwpb.App
+	users   map[string]*usermwpb.User
 }
 
 func (h *queryHandler) getApps(ctx context.Context) (err error) {
 	h.apps, err = gwcommon.GetApps(ctx, func() (appIDs []string) {
-		for _, sub := range h.subs {
-			appIDs = append(appIDs, sub.AppID)
+		for _, record := range h.records {
+			appIDs = append(appIDs, record.AppID)
 		}
 		return
 	}())
@@ -34,8 +34,8 @@ func (h *queryHandler) getApps(ctx context.Context) (err error) {
 
 func (h *queryHandler) getUsers(ctx context.Context) (err error) {
 	h.users, err = gwcommon.GetUsers(ctx, func() (userIDs []string) {
-		for _, sub := range h.subs {
-			userIDs = append(userIDs, sub.UserID)
+		for _, record := range h.records {
+			userIDs = append(userIDs, record.UserID)
 		}
 		return
 	}())
@@ -43,25 +43,23 @@ func (h *queryHandler) getUsers(ctx context.Context) (err error) {
 }
 
 func (h *queryHandler) formalize() {
-	for _, sub := range h.subs {
-		info := &npool.UserSubscription{
-			ID:                 sub.ID,
-			EntID:              sub.EntID,
-			AppID:              sub.AppID,
-			StartAt:            sub.StartAt,
-			EndAt:              sub.EndAt,
-			UsageState:         sub.UsageState,
-			SubscriptionCredit: sub.SubscriptionCredit,
-			AddonCredit:        sub.AddonCredit,
-			CreatedAt:          sub.CreatedAt,
-			UpdatedAt:          sub.UpdatedAt,
+	for _, recommend := range h.records {
+		info := &npool.UserCreditRecord{
+			ID:            recommend.ID,
+			EntID:         recommend.EntID,
+			AppID:         recommend.AppID,
+			OperationType: recommend.OperationType,
+			CreditsChange: recommend.CreditsChange,
+			Extra:         recommend.Extra,
+			CreatedAt:     recommend.CreatedAt,
+			UpdatedAt:     recommend.UpdatedAt,
 		}
 
-		app, ok := h.apps[sub.AppID]
+		app, ok := h.apps[recommend.AppID]
 		if ok {
 			info.AppName = app.Name
 		}
-		user, ok := h.users[sub.UserID]
+		user, ok := h.users[recommend.UserID]
 		if ok {
 			if user.Username != "" {
 				info.Username = &user.Username
@@ -77,18 +75,18 @@ func (h *queryHandler) formalize() {
 	}
 }
 
-func (h *Handler) GetSubscription(ctx context.Context) (*npool.UserSubscription, error) {
-	sub, err := submwcli.GetSubscription(ctx, *h.EntID)
+func (h *Handler) GetUserCreditRecord(ctx context.Context) (*npool.UserCreditRecord, error) {
+	record, err := recordmwcli.GetRecord(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}
-	if sub == nil {
-		return nil, fmt.Errorf("invalid subscription")
+	if record == nil {
+		return nil, fmt.Errorf("invalid record")
 	}
 
 	handler := &queryHandler{
 		Handler: h,
-		subs:    []*submwpb.Subscription{sub},
+		records: []*recordmwpb.Record{record},
 		apps:    map[string]*appmwpb.App{},
 		users:   map[string]*usermwpb.User{},
 	}
@@ -107,8 +105,8 @@ func (h *Handler) GetSubscription(ctx context.Context) (*npool.UserSubscription,
 	return handler.infos[0], nil
 }
 
-func (h *Handler) GetSubscriptions(ctx context.Context) ([]*npool.UserSubscription, error) {
-	conds := &submwpb.Conds{
+func (h *Handler) GetUserCreditRecords(ctx context.Context) ([]*npool.UserCreditRecord, error) {
+	conds := &recordmwpb.Conds{
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	}
 
@@ -116,17 +114,17 @@ func (h *Handler) GetSubscriptions(ctx context.Context) ([]*npool.UserSubscripti
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
 
-	subs, err := submwcli.GetSubscriptions(ctx, conds, h.Offset, h.Limit)
+	records, err := recordmwcli.GetRecords(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
 		return nil, err
 	}
-	if len(subs) == 0 {
+	if len(records) == 0 {
 		return nil, nil
 	}
 
 	handler := &queryHandler{
 		Handler: h,
-		subs:    subs,
+		records: records,
 		apps:    map[string]*appmwpb.App{},
 		users:   map[string]*usermwpb.User{},
 	}
@@ -141,13 +139,13 @@ func (h *Handler) GetSubscriptions(ctx context.Context) ([]*npool.UserSubscripti
 	return handler.infos, nil
 }
 
-func (h *Handler) GetSubscriptionsCount(ctx context.Context) (uint32, error) {
-	conds := &submwpb.Conds{
+func (h *Handler) GetUserCreditRecordsCount(ctx context.Context) (uint32, error) {
+	conds := &recordmwpb.Conds{
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	}
 
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
-	return submwcli.GetSubscriptionsCount(ctx, conds)
+	return recordmwcli.GetRecordsCount(ctx, conds)
 }

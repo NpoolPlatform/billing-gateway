@@ -4,12 +4,13 @@ import (
 	"context"
 
 	submwcli "github.com/NpoolPlatform/billing-middleware/pkg/client/user/subscription"
+	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1/user/subscription"
 	submwpb "github.com/NpoolPlatform/message/npool/billing/mw/v1/user/subscription"
 
 	"github.com/google/uuid"
 )
 
-func (h *Handler) CreateSubscription(ctx context.Context) (*submwpb.Subscription, error) {
+func (h *Handler) CreateSubscription(ctx context.Context) (*npool.UserSubscription, error) {
 	if h.EntID == nil {
 		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}

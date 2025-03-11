@@ -1,24 +1,24 @@
-package addon
+package record
 
 import (
 	"context"
 
-	addon "github.com/NpoolPlatform/message/npool/billing/gw/v1/addon"
+	record "github.com/NpoolPlatform/message/npool/billing/gw/v1/user/credit/record"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
-	addon.UnimplementedGatewayServer
+	record.UnimplementedGatewayServer
 }
 
 func Register(server grpc.ServiceRegistrar) {
-	addon.RegisterGatewayServer(server, &Server{})
+	record.RegisterGatewayServer(server, &Server{})
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
-	if err := addon.RegisterGatewayHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
+	if err := record.RegisterGatewayHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil

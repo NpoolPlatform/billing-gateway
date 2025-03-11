@@ -3,6 +3,7 @@ module github.com/NpoolPlatform/billing-gateway
 go 1.17
 
 require (
+	github.com/NpoolPlatform/appuser-middleware v0.0.0-20240119021359-948c8504d662
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20231015112137-254853c60eec
 	github.com/NpoolPlatform/billing-middleware v0.0.0-20250311060941-0a3f48aa64f7
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20240507084859-362174af9b92
@@ -114,3 +115,5 @@ replace entgo.io/ent => entgo.io/ent v0.11.2
 replace ariga.io/atlas => ariga.io/atlas v0.5.1-0.20220717122844-8593d7eb1a8e
 
 replace github.com/ugorji/go => github.com/ugorji/go v0.0.0-20190204201341-e444a5086c43
+
+replace github.com/NpoolPlatform/message v0.0.0-20250311030836-46e4c8b75ad1 => ../message
