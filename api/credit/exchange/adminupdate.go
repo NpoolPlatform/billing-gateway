@@ -18,8 +18,8 @@ func (s *Server) AdminUpdateExchange(ctx context.Context, in *npool.AdminUpdateE
 		exchange1.WithID(&in.ID, true),
 		exchange1.WithEntID(&in.EntID, true),
 		exchange1.WithAppID(&in.TargetAppID, true),
-		exchange1.WithCredit(&in.Credit, false),
-		exchange1.WithExchangeThreshold(&in.ExchangeThreshold, false),
+		exchange1.WithCredit(in.Credit, false),
+		exchange1.WithExchangeThreshold(in.ExchangeThreshold, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
