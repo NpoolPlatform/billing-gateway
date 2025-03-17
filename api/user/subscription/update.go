@@ -17,13 +17,14 @@ func (s *Server) UpdateSubscription(ctx context.Context, in *npool.UpdateSubscri
 		ctx,
 		subscription1.WithID(&in.ID, true),
 		subscription1.WithEntID(&in.EntID, true),
-		subscription1.WithAppID(&in.AppID, false),
-		subscription1.WithUserID(&in.UserID, false),
+		subscription1.WithAppID(&in.AppID, true),
+		subscription1.WithUserID(&in.UserID, true),
 		subscription1.WithStartAt(in.StartAt, false),
 		subscription1.WithEndAt(in.EndAt, false),
 		subscription1.WithUsageState(in.UsageState, false),
 		subscription1.WithSubscriptionCredit(in.SubscriptionCredit, false),
 		subscription1.WithAddonCredit(in.AddonCredit, false),
+		subscription1.WithPackageID(in.PackageID, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

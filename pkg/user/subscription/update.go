@@ -4,12 +4,37 @@ import (
 	"context"
 
 	submwcli "github.com/NpoolPlatform/billing-middleware/pkg/client/user/subscription"
+	subchangemwcli "github.com/NpoolPlatform/billing-middleware/pkg/client/user/subscription/change"
 	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1/user/subscription"
 	submwpb "github.com/NpoolPlatform/message/npool/billing/mw/v1/user/subscription"
+	subchangemwpb "github.com/NpoolPlatform/message/npool/billing/mw/v1/user/subscription/change"
 )
 
 type updateHandler struct {
 	*checkHandler
+}
+
+func (h *updateHandler) subscriptionChange(ctx context.Context) error {
+	if h.PackageID == nil {
+		return nil
+	}
+	sub, err := submwcli.GetSubscription(ctx, *h.EntID)
+	if err != nil {
+		return err
+	}
+	if sub.PackageID == *h.PackageID {
+		return nil
+	}
+	if err := subchangemwcli.CreateSubscriptionChange(ctx, &subchangemwpb.SubscriptionChangeReq{
+		AppID:              h.AppID,
+		UserID:             h.UserID,
+		UserSubscriptionID: h.EntID,
+		OldPackageID:       &sub.PackageID,
+		NewPackageID:       h.PackageID,
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (h *Handler) UpdateSubscription(ctx context.Context) (*npool.UserSubscription, error) {
@@ -19,6 +44,9 @@ func (h *Handler) UpdateSubscription(ctx context.Context) (*npool.UserSubscripti
 		},
 	}
 	if err := handler.checkSubscription(ctx); err != nil {
+		return nil, err
+	}
+	if err := handler.subscriptionChange(ctx); err != nil {
 		return nil, err
 	}
 	if err := submwcli.UpdateSubscription(ctx, &submwpb.SubscriptionReq{
