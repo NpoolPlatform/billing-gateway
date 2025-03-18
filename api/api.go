@@ -10,18 +10,18 @@ import (
 	record "github.com/NpoolPlatform/billing-gateway/api/user/credit/record"
 	usersubscription "github.com/NpoolPlatform/billing-gateway/api/user/subscription"
 	usersubscriptionchange "github.com/NpoolPlatform/billing-gateway/api/user/subscription/change"
-	servicetmpl "github.com/NpoolPlatform/message/npool/servicetmpl/mw/v1"
+	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
-	servicetmpl.UnimplementedMiddlewareServer
+	npool.UnimplementedGatewayServer
 }
 
 func Register(server grpc.ServiceRegistrar) {
-	servicetmpl.RegisterMiddlewareServer(server, &Server{})
+	npool.RegisterGatewayServer(server, &Server{})
 	addon.Register(server)
 	subscription.Register(server)
 	exchange.Register(server)
@@ -32,7 +32,7 @@ func Register(server grpc.ServiceRegistrar) {
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
-	if err := servicetmpl.RegisterMiddlewareHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
+	if err := npool.RegisterGatewayHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 		return err
 	}
 	if err := addon.RegisterGateway(mux, endpoint, opts); err != nil {
