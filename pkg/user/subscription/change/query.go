@@ -106,8 +106,10 @@ func (h *Handler) GetSubscriptionChange(ctx context.Context) (*npool.UserSubscri
 }
 
 func (h *Handler) GetSubscriptionChanges(ctx context.Context) ([]*npool.UserSubscriptionChange, error) {
-	conds := &subchangemwpb.Conds{
-		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	conds := &subchangemwpb.Conds{}
+
+	if h.AppID != nil {
+		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
 	}
 
 	if h.UserID != nil {
