@@ -25,6 +25,7 @@ func (h *Handler) UpdateExchange(ctx context.Context) (*submwpb.Exchange, error)
 		EntID:             h.EntID,
 		Credit:            h.Credit,
 		ExchangeThreshold: h.ExchangeThreshold,
+		Path:              h.Path,
 	}); err != nil {
 		return nil, err
 	}

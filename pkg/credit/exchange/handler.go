@@ -17,6 +17,7 @@ type Handler struct {
 	UsageType         *types.UsageType
 	Credit            *uint32
 	ExchangeThreshold *uint32
+	Path              *string
 	Offset            int32
 	Limit             int32
 }
@@ -107,6 +108,19 @@ func WithCredit(n *uint32, must bool) func(context.Context, *Handler) error {
 			return nil
 		}
 		h.Credit = n
+		return nil
+	}
+}
+
+func WithPath(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid credit")
+			}
+			return nil
+		}
+		h.Path = s
 		return nil
 	}
 }

@@ -19,6 +19,7 @@ func (s *Server) AdminCreateExchange(ctx context.Context, in *npool.AdminCreateE
 		exchange1.WithUsageType(&in.UsageType, true),
 		exchange1.WithCredit(&in.Credit, true),
 		exchange1.WithExchangeThreshold(&in.ExchangeThreshold, true),
+		exchange1.WithPath(&in.Path, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
