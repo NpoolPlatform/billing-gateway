@@ -71,6 +71,9 @@ func (h *calculateHandler) getUserSubscription(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	if sub == nil {
+		return wlog.Errorf("invalid user subscription")
+	}
 	h.userSubscription = sub
 	return nil
 }
