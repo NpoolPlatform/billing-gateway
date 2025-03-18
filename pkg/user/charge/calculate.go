@@ -51,6 +51,9 @@ func (h *calculateHandler) getExchange(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	if exchange == nil {
+		return wlog.Errorf("invalid exchange")
+	}
 	h.exchange = exchange
 	return nil
 }
