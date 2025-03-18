@@ -101,8 +101,8 @@ func (h *calculateHandler) deductedCredit(ctx context.Context, subDeducted, addo
 	subBalance := h.userSubscription.SubscriptionCredit - subDeducted
 	addonBalance := h.userSubscription.AddonCredit - addonDeducted
 	if err := submwcli.UpdateSubscription(ctx, &submwpb.SubscriptionReq{
-		ID:                 h.ID,
-		EntID:              h.EntID,
+		ID:                 &h.userSubscription.ID,
+		EntID:              &h.userSubscription.EntID,
 		SubscriptionCredit: &subBalance,
 		AddonCredit:        &addonBalance,
 	}); err != nil {
