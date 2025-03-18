@@ -6,8 +6,10 @@ import (
 	addon "github.com/NpoolPlatform/billing-gateway/api/addon"
 	exchange "github.com/NpoolPlatform/billing-gateway/api/credit/exchange"
 	subscription "github.com/NpoolPlatform/billing-gateway/api/subscription"
+	usercharge "github.com/NpoolPlatform/billing-gateway/api/user/charge"
 	record "github.com/NpoolPlatform/billing-gateway/api/user/credit/record"
 	usersubscription "github.com/NpoolPlatform/billing-gateway/api/user/subscription"
+	usersubscriptionchange "github.com/NpoolPlatform/billing-gateway/api/user/subscription/change"
 	servicetmpl "github.com/NpoolPlatform/message/npool/servicetmpl/mw/v1"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -25,6 +27,8 @@ func Register(server grpc.ServiceRegistrar) {
 	exchange.Register(server)
 	usersubscription.Register(server)
 	record.Register(server)
+	usersubscriptionchange.Register(server)
+	usercharge.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
@@ -46,5 +50,12 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 	if err := record.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
+	if err := usersubscriptionchange.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := usercharge.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+
 	return nil
 }
