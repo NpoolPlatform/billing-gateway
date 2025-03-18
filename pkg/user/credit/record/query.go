@@ -142,8 +142,10 @@ func (h *Handler) GetUserCreditRecords(ctx context.Context) ([]*npool.UserCredit
 }
 
 func (h *Handler) GetUserCreditRecordsCount(ctx context.Context) (uint32, error) {
-	conds := &recordmwpb.Conds{
-		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	conds := &recordmwpb.Conds{}
+
+	if h.AppID != nil {
+		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
 	}
 
 	if h.UserID != nil {

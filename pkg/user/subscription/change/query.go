@@ -142,8 +142,10 @@ func (h *Handler) GetSubscriptionChanges(ctx context.Context) ([]*npool.UserSubs
 }
 
 func (h *Handler) GetSubscriptionChangesCount(ctx context.Context) (uint32, error) {
-	conds := &subchangemwpb.Conds{
-		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	conds := &subchangemwpb.Conds{}
+
+	if h.AppID != nil {
+		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
 	}
 
 	if h.UserID != nil {
