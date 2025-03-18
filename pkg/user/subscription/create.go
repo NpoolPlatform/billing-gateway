@@ -14,6 +14,12 @@ func (h *Handler) CreateSubscription(ctx context.Context) (*npool.UserSubscripti
 	if h.EntID == nil {
 		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
+	if h.StartAt == nil {
+		h.StartAt = func() *uint32 { u := uint32(0); return &u }()
+	}
+	if h.EndAt == nil {
+		h.EndAt = func() *uint32 { u := uint32(0); return &u }()
+	}
 
 	if err := submwcli.CreateSubscription(ctx, &submwpb.SubscriptionReq{
 		EntID:              h.EntID,
@@ -22,7 +28,6 @@ func (h *Handler) CreateSubscription(ctx context.Context) (*npool.UserSubscripti
 		PackageID:          h.PackageID,
 		StartAt:            h.StartAt,
 		EndAt:              h.EndAt,
-		OrderID:            h.OrderID,
 		UsageState:         h.UsageState,
 		SubscriptionCredit: h.SubscriptionCredit,
 		AddonCredit:        h.AddonCredit,

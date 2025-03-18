@@ -12,39 +12,38 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1/user/subscription"
 )
 
-func (s *Server) CreateSubscription(ctx context.Context, in *npool.CreateSubscriptionRequest) (*npool.CreateSubscriptionResponse, error) {
+func (s *Server) AdminCreateSubscription(ctx context.Context, in *npool.AdminCreateSubscriptionRequest) (*npool.AdminCreateSubscriptionResponse, error) {
 	handler, err := subscription1.NewHandler(
 		ctx,
-		subscription1.WithAppID(&in.AppID, true),
-		subscription1.WithUserID(in.UserID, true),
-		subscription1.WithPackageID(in.PackageID, true),
-		subscription1.WithStartAt(in.StartAt, true),
-		subscription1.WithEndAt(in.EndAt, true),
-		subscription1.WithOrderID(in.OrderID, true),
-		subscription1.WithUsageState(in.UsageState, true),
-		subscription1.WithSubscriptionCredit(in.SubscriptionCredit, true),
-		subscription1.WithAddonCredit(in.AddonCredit, true),
+		subscription1.WithAppID(&in.TargetAppID, true),
+		subscription1.WithUserID(&in.TargetUserID, true),
+		subscription1.WithPackageID(in.PackageID, false),
+		subscription1.WithStartAt(in.StartAt, false),
+		subscription1.WithEndAt(in.EndAt, false),
+		subscription1.WithUsageState(&in.UsageState, true),
+		subscription1.WithSubscriptionCredit(&in.SubscriptionCredit, true),
+		subscription1.WithAddonCredit(&in.AddonCredit, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateSubscription",
+			"AdminCreateSubscription",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateSubscriptionResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminCreateSubscriptionResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.CreateSubscription(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateSubscription",
+			"AdminCreateSubscription",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateSubscriptionResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminCreateSubscriptionResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.CreateSubscriptionResponse{
+	return &npool.AdminCreateSubscriptionResponse{
 		Info: info,
 	}, nil
 }

@@ -12,13 +12,13 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/billing/gw/v1/user/subscription"
 )
 
-func (s *Server) UpdateSubscription(ctx context.Context, in *npool.UpdateSubscriptionRequest) (*npool.UpdateSubscriptionResponse, error) {
+func (s *Server) AdminUpdateSubscription(ctx context.Context, in *npool.AdminUpdateSubscriptionRequest) (*npool.AdminUpdateSubscriptionResponse, error) {
 	handler, err := subscription1.NewHandler(
 		ctx,
 		subscription1.WithID(&in.ID, true),
 		subscription1.WithEntID(&in.EntID, true),
-		subscription1.WithAppID(&in.AppID, true),
-		subscription1.WithUserID(&in.UserID, true),
+		subscription1.WithAppID(&in.TargetAppID, true),
+		subscription1.WithUserID(&in.TargetUserID, true),
 		subscription1.WithStartAt(in.StartAt, false),
 		subscription1.WithEndAt(in.EndAt, false),
 		subscription1.WithUsageState(in.UsageState, false),
@@ -28,24 +28,24 @@ func (s *Server) UpdateSubscription(ctx context.Context, in *npool.UpdateSubscri
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateSubscription",
+			"AdminUpdateSubscription",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateSubscriptionResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateSubscriptionResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.UpdateSubscription(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateSubscription",
+			"AdminUpdateSubscription",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateSubscriptionResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateSubscriptionResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.UpdateSubscriptionResponse{
+	return &npool.AdminUpdateSubscriptionResponse{
 		Info: info,
 	}, nil
 }

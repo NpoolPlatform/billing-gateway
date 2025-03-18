@@ -18,7 +18,6 @@ type Handler struct {
 	PackageID          *string
 	StartAt            *uint32
 	EndAt              *uint32
-	OrderID            *string
 	UsageState         *types.UsageState
 	SubscriptionCredit *uint32
 	AddonCredit        *uint32
@@ -109,22 +108,6 @@ func WithPackageID(id *string, must bool) func(context.Context, *Handler) error 
 			return err
 		}
 		h.PackageID = id
-		return nil
-	}
-}
-
-func WithOrderID(id *string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
-			if must {
-				return fmt.Errorf("invalid orderid")
-			}
-			return nil
-		}
-		if _, err := uuid.Parse(*id); err != nil {
-			return err
-		}
-		h.OrderID = id
 		return nil
 	}
 }
