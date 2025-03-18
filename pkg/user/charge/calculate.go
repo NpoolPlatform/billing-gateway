@@ -14,6 +14,7 @@ import (
 	exchangemwpb "github.com/NpoolPlatform/message/npool/billing/mw/v1/credit/exchange"
 	recordmwpb "github.com/NpoolPlatform/message/npool/billing/mw/v1/user/credit/record"
 	submwpb "github.com/NpoolPlatform/message/npool/billing/mw/v1/user/subscription"
+	"github.com/go-ego/gse"
 )
 
 type calculateHandler struct {
@@ -24,11 +25,15 @@ type calculateHandler struct {
 	extra            string
 }
 
-func (h *calculateHandler) calculateByToken() {
-	// pre token
-	const preTokenCount = uint32(2000)
-	h.consumeCredit = h.exchange.Credit * preTokenCount
-	h.extra = fmt.Sprintf("prededucted %v tokens", preTokenCount)
+func (h *calculateHandler) calculateByToken() error {
+	var seg gse.Segmenter
+	if err := seg.LoadDict("zh, en"); err != nil {
+		return wlog.WrapError(err)
+	}
+	tokens := seg.Cut(h.ReqMsg, true)
+	h.consumeCredit = h.exchange.Credit * uint32(len(tokens))
+	h.extra = fmt.Sprintf("deducted %v tokens", len(tokens))
+	return nil
 }
 
 func (h *calculateHandler) calculateByCount() {
@@ -135,7 +140,9 @@ func (h *Handler) CalculateCharge(ctx context.Context) (allow bool, msg string, 
 	case types.UsageType_VideoCount:
 		handler.calculateByCount()
 	case types.UsageType_TextToken:
-		handler.calculateByToken()
+		if err := handler.calculateByToken(); err != nil {
+			return false, "", err
+		}
 	case types.UsageType_FilePageCount:
 		handler.calculateByFilePage()
 	default:
