@@ -64,7 +64,7 @@ pipeline {
         sh 'git clone https://github.com/NpoolPlatform/apollo-base-config.git .apollo-base-config'
         sh(returnStdout: false, script: '''
           PASSWORD=`kubectl get secret --namespace "kube-system" mysql-password-secret -o jsonpath="{.data.rootpassword}" | base64 --decode`
-          kubectl exec --namespace kube-system mysql-0 -- mysql -h 127.0.0.1 -uroot -p$PASSWORD -P3306 -e "create database if not exists service_template;"
+          kubectl exec --namespace kube-system mysql-0 -- mysql -h 127.0.0.1 -uroot -p$PASSWORD -P3306 -e "create database if not exists billing_manager;"
 
           username=`helm status rabbitmq --namespace kube-system | grep Username | awk -F ' : ' '{print $2}' | sed 's/"//g'`
           for vhost in `cat cmd/*/*.viper.yaml | grep hostname | awk '{print $2}' | sed 's/"//g' | sed 's/\\./-/g'`; do
@@ -73,7 +73,7 @@ pipeline {
 
             cd .apollo-base-config
             ./apollo-base-config.sh $APP_ID $TARGET_ENV $vhost
-            ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost database_name service_template
+            ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost database_name billing_manager
             cd -
           done
         '''.stripIndent())
@@ -87,7 +87,7 @@ pipeline {
       steps {
         sh(returnStdout: false, script: '''
           devboxpod=`kubectl get pods -A | grep development-box | head -n1 | awk '{print $2}'`
-          servicename="service-template"
+          servicename="billing-gateway"
 
           kubectl exec --namespace kube-system $devboxpod -- make -C /tmp/$servicename after-test || true
           kubectl exec --namespace kube-system $devboxpod -- rm -rf /tmp/$servicename || true
@@ -252,13 +252,13 @@ pipeline {
             branch=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
           fi
           set +e
-          docker images | grep service-template | grep $branch
+          docker images | grep billing-gateway | grep $branch
           rc=$?
           set -e
           if [ 0 -eq $rc ]; then
             DOCKER_REGISTRY=$DOCKER_REGISTRY make release-docker-images
           fi
-          images=`docker images | grep entropypool | grep service-template | grep none | awk '{ print $3 }'`
+          images=`docker images | grep entropypool | grep billing-gateway | grep none | awk '{ print $3 }'`
           for image in $images; do
             docker rmi $image -f
           done
@@ -280,7 +280,7 @@ pipeline {
           if [ 0 -eq $rc -a x"$revlist" != x ]; then
             tag=`git tag --sort=-v:refname | grep [1\\|3\\|5\\|7\\|9]$ | head -n1`
             set +e
-            docker images | grep service-template | grep $tag
+            docker images | grep billing-gateway | grep $tag
             rc=$?
             set -e
             if [ 0 -eq $rc ]; then
@@ -305,7 +305,7 @@ pipeline {
           if [ 0 -eq $rc -a x"$taglist" != x ]; then
             tag=`git tag --sort=-v:refname | grep [0\\|2\\|4\\|6\\|8]$ | head -n1`
             set +e
-            docker images | grep service-template | grep $tag
+            docker images | grep billing-gateway | grep $tag
             rc=$?
             set -e
             if [ 0 -eq $rc ]; then
@@ -327,12 +327,12 @@ pipeline {
           if [ "x$BRANCH_NAME" != "xmaster" ]; then
             branch=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
           fi
-          sed -i "s/service-template:latest/service-template:$branch/g" cmd/service-template/k8s/02-service-template.yaml
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/service-template/k8s/02-service-template.yaml
+          sed -i "s/billing-gateway:latest/billing-gateway:$branch/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
           if [ "x$REPLICAS_COUNT" == "x" ];then
             REPLICAS_COUNT=2
           fi
-          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/service-template/k8s/02-service-template.yaml
+          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
           make deploy-to-k8s-cluster
         '''.stripIndent())
       }
@@ -356,13 +356,13 @@ pipeline {
 
           git reset --hard
           git checkout $tag
-          sed -i "s/service-template:latest/service-template:$tag/g" cmd/service-template/k8s/02-service-template.yaml
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/service-template/k8s/02-service-template.yaml
+          sed -i "s/billing-gateway:latest/billing-gateway:$tag/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
           if [ "x$REPLICAS_COUNT" == "x" ];then
             REPLICAS_COUNT=2
           fi
-          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/service-template/k8s/02-service-template.yaml
-          sed -i "s/imagePullPolicy: Always/imagePullPolicy: IfNotPresent/g" cmd/service-template/k8s/02-service-template.yaml
+          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
+          sed -i "s/imagePullPolicy: Always/imagePullPolicy: IfNotPresent/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
           make deploy-to-k8s-cluster
         '''.stripIndent())
       }
@@ -385,13 +385,13 @@ pipeline {
           tag=`git tag --sort=-v:refname | grep [0\\|2\\|4\\|6\\|8]$ | head -n1`
           git reset --hard
           git checkout $tag
-          sed -i "s/service-template:latest/service-template:$tag/g" cmd/service-template/k8s/02-service-template.yaml
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/service-template/k8s/02-service-template.yaml
+          sed -i "s/billing-gateway:latest/billing-gateway:$tag/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
           if [ "x$REPLICAS_COUNT" == "x" ];then
             REPLICAS_COUNT=2
           fi
-          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/service-template/k8s/02-service-template.yaml
-          sed -i "s/imagePullPolicy: Always/imagePullPolicy: IfNotPresent/g" cmd/service-template/k8s/02-service-template.yaml
+          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
+          sed -i "s/imagePullPolicy: Always/imagePullPolicy: IfNotPresent/g" cmd/billing-gateway/k8s/02-billing-gateway.yaml
           make deploy-to-k8s-cluster
         '''.stripIndent())
       }
