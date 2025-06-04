@@ -23,7 +23,7 @@ func (h *Handler) UpdateAddon(ctx context.Context) (*submwpb.Addon, error) {
 	if err := submwcli.UpdateAddon(ctx, &submwpb.AddonReq{
 		ID:          h.ID,
 		EntID:       h.EntID,
-		Price:       h.Price,
+		UsdPrice:    h.UsdPrice,
 		Credit:      h.Credit,
 		SortOrder:   h.SortOrder,
 		Enabled:     h.Enabled,

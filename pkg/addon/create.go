@@ -17,7 +17,7 @@ func (h *Handler) CreateAddon(ctx context.Context) (*submwpb.Addon, error) {
 	if err := submwcli.CreateAddon(ctx, &submwpb.AddonReq{
 		EntID:       h.EntID,
 		AppID:       h.AppID,
-		Price:       h.Price,
+		UsdPrice:    h.UsdPrice,
 		Credit:      h.Credit,
 		SortOrder:   h.SortOrder,
 		Enabled:     h.Enabled,

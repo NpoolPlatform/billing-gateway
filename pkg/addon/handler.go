@@ -16,7 +16,7 @@ type Handler struct {
 	EntID       *string
 	AppID       *string
 	PackageName *string
-	Price       *string
+	UsdPrice    *string
 	Description *string
 	SortOrder   *uint32
 	Enabled     *bool
@@ -99,7 +99,7 @@ func WithPackageName(s *string, must bool) func(context.Context, *Handler) error
 	}
 }
 
-func WithPrice(s *string, must bool) func(context.Context, *Handler) error {
+func WithUsdPrice(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
@@ -114,7 +114,7 @@ func WithPrice(s *string, must bool) func(context.Context, *Handler) error {
 		if amount.LessThanOrEqual(decimal.NewFromInt(0)) {
 			return fmt.Errorf("invalid price")
 		}
-		h.Price = s
+		h.UsdPrice = s
 		return nil
 	}
 }

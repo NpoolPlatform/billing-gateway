@@ -17,7 +17,7 @@ func (s *Server) AdminCreateSubscription(ctx context.Context, in *npool.AdminCre
 		ctx,
 		subscription1.WithAppID(&in.TargetAppID, true),
 		subscription1.WithPackageName(in.PackageName, true),
-		subscription1.WithPrice(in.Price, true),
+		subscription1.WithUsdPrice(in.UsdPrice, true),
 		subscription1.WithDescription(in.Description, true),
 		subscription1.WithSortOrder(in.SortOrder, true),
 		subscription1.WithPackageType(in.PackageType, true),

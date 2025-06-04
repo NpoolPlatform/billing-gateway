@@ -16,7 +16,7 @@ func (s *Server) AdminCreateAddon(ctx context.Context, in *npool.AdminCreateAddo
 	handler, err := addon1.NewHandler(
 		ctx,
 		addon1.WithAppID(&in.TargetAppID, true),
-		addon1.WithPrice(&in.Price, true),
+		addon1.WithUsdPrice(&in.UsdPrice, true),
 		addon1.WithCredit(&in.Credit, true),
 		addon1.WithSortOrder(&in.SortOrder, false),
 		addon1.WithEnabled(&in.Enabled, false),

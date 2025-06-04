@@ -18,7 +18,7 @@ func (h *Handler) CreateSubscription(ctx context.Context) (*submwpb.Subscription
 		EntID:       h.EntID,
 		AppID:       h.AppID,
 		PackageName: h.PackageName,
-		Price:       h.Price,
+		UsdPrice:    h.UsdPrice,
 		Description: h.Description,
 		SortOrder:   h.SortOrder,
 		PackageType: h.PackageType,

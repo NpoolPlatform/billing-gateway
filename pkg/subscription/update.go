@@ -24,7 +24,7 @@ func (h *Handler) UpdateSubscription(ctx context.Context) (*submwpb.Subscription
 		ID:          h.ID,
 		EntID:       h.EntID,
 		PackageName: h.PackageName,
-		Price:       h.Price,
+		UsdPrice:    h.UsdPrice,
 		Description: h.Description,
 		SortOrder:   h.SortOrder,
 		Credit:      h.Credit,

@@ -18,7 +18,7 @@ func (s *Server) AdminUpdateAddon(ctx context.Context, in *npool.AdminUpdateAddo
 		addon1.WithID(&in.ID, true),
 		addon1.WithEntID(&in.EntID, true),
 		addon1.WithAppID(&in.TargetAppID, false),
-		addon1.WithPrice(in.Price, false),
+		addon1.WithUsdPrice(in.UsdPrice, false),
 		addon1.WithCredit(in.Credit, false),
 		addon1.WithSortOrder(in.SortOrder, false),
 		addon1.WithEnabled(in.Enabled, false),

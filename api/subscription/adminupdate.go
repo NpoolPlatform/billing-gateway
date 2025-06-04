@@ -19,7 +19,7 @@ func (s *Server) AdminUpdateSubscription(ctx context.Context, in *npool.AdminUpd
 		subscription1.WithEntID(&in.EntID, true),
 		subscription1.WithAppID(&in.TargetAppID, false),
 		subscription1.WithPackageName(in.PackageName, false),
-		subscription1.WithPrice(in.Price, false),
+		subscription1.WithUsdPrice(in.UsdPrice, false),
 		subscription1.WithDescription(in.Description, false),
 		subscription1.WithSortOrder(in.SortOrder, false),
 		subscription1.WithCredit(in.Credit, false),
